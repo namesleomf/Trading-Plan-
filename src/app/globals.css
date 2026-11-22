@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+/*
+ * "Midnight Desk" design system.
+ * Colours live in CSS variables so the light theme (and a future accent
+ * picker) can swap them without touching components.
+ */
+
+/* Variants driven by attributes the inline script in layout.tsx sets before first paint. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+@custom-variant sidebar-collapsed (&:where([data-sidebar="collapsed"], [data-sidebar="collapsed"] *));
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #05070d;
+  --glow: rgba(59, 130, 246, 0.18);
+  --surface: #0b1120;
+  --surface-raised: #111a2e;
+  --border: rgba(148, 163, 255, 0.08);
+  --border-strong: rgba(148, 163, 255, 0.16);
+  --text: #f4f6ff;
+  --text-2: #9aa4bf;
+  --text-3: #5b6582;
+  --primary: #3b82f6;
+  --primary-2: #8b7cf6;
+  --gold: #d9a955;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --star: rgba(255, 255, 255, 0.9);
+  --star-opacity: 0.05;
+  --gradient-text: linear-gradient(90deg, #f4f6ff, #93b4ff 55%, #8b7cf6);
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 24px 48px -32px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7fc;
+  --glow: rgba(59, 130, 246, 0.14);
+  --surface: #ffffff;
+  --surface-raised: #eef2fa;
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.14);
+  --text: #0b1120;
+  --text-2: #4a5470;
+  --text-3: #8a93ad;
+  --primary: #2563eb;
+  --primary-2: #7c3aed;
+  --gold: #b7862f;
+  --green: #16a34a;
+  --amber: #d97706;
+  --red: #dc2626;
+  --star: rgba(15, 23, 42, 0.9);
+  --star-opacity: 0.04;
+  --gradient-text: linear-gradient(90deg, #0b1120, #2563eb 55%, #7c3aed);
+  --shadow-card: 0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 24px 48px -32px rgba(15, 23, 42, 0.18);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-fg-2: var(--text-2);
+  --color-fg-3: var(--text-3);
+  --color-primary: var(--primary);
+  --color-primary-2: var(--primary-2);
+  --color-gold: var(--gold);
+  --color-green: var(--green);
+  --color-amber: var(--amber);
+  --color-red: var(--red);
+
+  --font-sans: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --animate-live-ping: live-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes live-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  75%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    position: relative;
+    z-index: 0;
+    min-height: 100dvh;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Top spotlight glow (fixed, behind everything). */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 45% at 50% -8%, var(--glow), transparent 70%),
+      radial-gradient(ellipse 40% 30% at 85% 0%, color-mix(in oklab, var(--primary-2) 10%, transparent), transparent 70%);
+  }
+
+  /* Faint starfield: two offset dot grids so it doesn't look like graph paper. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--star-opacity);
+    background-image:
+      radial-gradient(var(--star) 1px, transparent 1.2px),
+      radial-gradient(var(--star) 0.8px, transparent 1px);
+    background-size:
+      46px 46px,
+      73px 73px;
+    background-position:
+      0 0,
+      23px 31px;
+    mask-image: linear-gradient(to bottom, black, transparent 85%);
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 35%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+@layer utilities {
+  /* Gradient headline text — use on the key word of a title only. */
+  .text-gradient {
+    background-image: var(--gradient-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Glass: top bar, mobile nav and modals only. */
+  .glass {
+    background-color: color-mix(in oklab, var(--surface) 72%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+  }
+
+  /* Numbers, times, prices, counters. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tiny letter-spaced uppercase labels. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
